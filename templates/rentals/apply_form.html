@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply for Rental — {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'properties:list' %}">Properties</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'properties:detail' property.slug %}">{{ property.title|truncatechars:25 }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Apply</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Property Summary Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3 p-3 sticky-top" style="top: 90px;">
+                <img src="{{ property.primary_image_url }}" alt="{{ property.title }}" class="rounded mb-3" style="width: 100%; height: 180px; object-fit: cover;">
+                <h5 class="fw-bold mb-1 text-dark">{{ property.title }}</h5>
+                <p class="text-muted small mb-2"><i class="bi bi-geo-alt me-1"></i>{{ property.address }}, {{ property.city }}</p>
+
+                <div class="border-top border-bottom py-2 my-2 small d-flex justify-content-between">
+                    <span class="text-muted">Monthly Rent:</span>
+                    <strong class="text-primary">${{ property.rent_amount }}</strong>
+                </div>
+                <div class="border-bottom pb-2 mb-2 small d-flex justify-content-between">
+                    <span class="text-muted">Security Deposit:</span>
+                    <strong class="text-dark">${{ property.security_deposit }}</strong>
+                </div>
+                <div class="border-bottom pb-2 mb-3 small d-flex justify-content-between">
+                    <span class="text-muted">Available From:</span>
+                    <strong class="text-dark">{{ property.available_from|date:"M d, Y" }}</strong>
+                </div>
+
+                <div class="small text-muted">
+                    <i class="bi bi-person-circle me-1"></i><strong>Landlord:</strong> {{ property.owner.get_full_name|default:property.owner.username }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Form -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                        <h3 class="fw-bold mb-1">Rental Application</h3>
+                        <p class="text-muted small mb-0">Submit your applicant credentials to the landlord for tenancy approval.</p>
+                    </div>
+                </div>
+
+                {% if existing_application %}
+                    <div class="alert alert-warning">
+                        <strong>Existing Application:</strong> You submitted an application for this property on {{ existing_application.applied_at|date:"M d, Y" }} with status <strong>{{ existing_application.get_status_display }}</strong>.
+                        <div class="mt-2">
+                            <a href="{% url 'rentals:my_applications' %}" class="btn btn-sm btn-outline-warning">View My Applications</a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <h5 class="fw-bold text-primary mb-3">1. Employment & Financial Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Employment Status *</label>
+                            {{ form.employment_status }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Current Employer / Company</label>
+                            {{ form.employer_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Annual Gross Income ($) *</label>
+                            {{ form.annual_income }}
+                            <div class="form-text small">Landlords generally look for 3x monthly rent.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Credit Score Range *</label>
+                            {{ form.credit_score_range }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-primary mb-3">2. Tenancy Occupancy & Dates</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Total Occupants *</label>
+                            {{ form.occupants_count }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Proposed Move-In Date *</label>
+                            {{ form.proposed_move_in }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Lease Term (Months) *</label>
+                            {{ form.lease_term_months }}
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                {{ form.has_pets }}
+                                <label class="form-check-label small fw-semibold ms-2" for="{{ form.has_pets.id_for_label }}">
+                                    I will be bringing domestic pets
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold">Pet Details (Breeds, weights, age)</label>
+                            {{ form.pets_description }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-primary mb-3">3. Message to Landlord</h5>
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Personal Note / Introduction</label>
+                        {{ form.message_to_landlord }}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'properties:detail' property.slug %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-send me-1"></i>Submit Rental Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

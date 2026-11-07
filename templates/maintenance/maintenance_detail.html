@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Ticket #{{ ticket.ticket_number }} — RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'maintenance:list' %}">Maintenance</a></li>
+            <li class="breadcrumb-item active" aria-current="page">#{{ ticket.ticket_number }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Main Ticket Details -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center pb-3 mb-3 border-bottom gap-2">
+                    <div>
+                        <span class="badge bg-secondary mb-1">{{ ticket.get_category_display }}</span>
+                        <h3 class="fw-bold text-dark mb-0">{{ ticket.title }}</h3>
+                        <small class="text-muted font-monospace">Ticket #{{ ticket.ticket_number }} &bull; Reported: {{ ticket.created_at|date:"F d, Y H:i" }}</small>
+                    </div>
+
+                    <div>
+                        {% if ticket.status == 'SUBMITTED' %}
+                            <span class="badge bg-secondary px-3 py-2 fs-6">Submitted</span>
+                        {% elif ticket.status == 'IN_PROGRESS' %}
+                            <span class="badge bg-warning text-dark px-3 py-2 fs-6"><i class="bi bi-gear-wide-connected me-1"></i>In Progress</span>
+                        {% elif ticket.status == 'RESOLVED' %}
+                            <span class="badge bg-success px-3 py-2 fs-6"><i class="bi bi-check-circle me-1"></i>Resolved</span>
+                        {% else %}
+                            <span class="badge bg-dark px-3 py-2 fs-6">Closed</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary small text-uppercase mb-2">Issue Description</h6>
+                    <div class="p-3 bg-light rounded border text-secondary" style="white-space: pre-line;">
+                        {{ ticket.description }}
+                    </div>
+                </div>
+
+                <!-- Photo Attachment -->
+                {% if ticket.attachment %}
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary small text-uppercase mb-2">Attached Photo / Evidence</h6>
+                    <a href="{{ ticket.attachment.url }}" target="_blank">
+                        <img src="{{ ticket.attachment.url }}" alt="{{ ticket.title }}" class="img-fluid rounded border shadow-sm" style="max-height: 350px;">
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Landlord / Contractor Resolution Notes -->
+                <div class="mt-4 pt-3 border-top">
+                    <h6 class="fw-bold text-primary small text-uppercase mb-2"><i class="bi bi-chat-left-dots me-1"></i>Owner & Management Response</h6>
+                    {% if ticket.landlord_response %}
+                        <div class="p-3 bg-success-subtle text-dark rounded border border-success-subtle">
+                            {{ ticket.landlord_response }}
+                            {% if ticket.resolved_at %}
+                                <small class="text-muted d-block mt-2"><i class="bi bi-check2-circle text-success me-1"></i>Marked resolved on {{ ticket.resolved_at|date:"M d, Y H:i" }}</small>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">Awaiting management response or contractor appointment update.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Specs & Owner Actions -->
+        <div class="col-lg-4">
+            <!-- Property Details -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+                <h6 class="fw-bold text-dark mb-3">Property Unit</h6>
+                <strong class="text-dark d-block">{{ ticket.property.title }}</strong>
+                <p class="text-muted small mb-2">{{ ticket.property.address }}, {{ ticket.property.city }}</p>
+
+                <hr class="my-3">
+                <div class="small mb-2">
+                    <span class="text-muted">Tenant:</span>
+                    <strong class="text-dark d-block">{{ ticket.tenant.get_full_name|default:ticket.tenant.username }}</strong>
+                    <span class="text-muted">{{ ticket.tenant.email }} &bull; {{ ticket.tenant.phone_number }}</span>
+                </div>
+                <div class="small">
+                    <span class="text-muted">Landlord:</span>
+                    <strong class="text-dark d-block">{{ ticket.property.owner.get_full_name|default:ticket.property.owner.username }}</strong>
+                </div>
+            </div>
+
+            <!-- Priority & Status Management -->
+            <div class="card border-0 shadow-sm rounded-3 p-4">
+                <h6 class="fw-bold text-dark mb-3">Ticket Parameters</h6>
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Urgency Level:</span>
+                    <span class="badge {% if ticket.priority == 'EMERGENCY' %}bg-danger{% elif ticket.priority == 'HIGH' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %} px-2 py-1">
+                        {{ ticket.get_priority_display }}
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Last Updated:</span>
+                    <span class="small text-muted">{{ ticket.updated_at|date:"M d, Y H:i" }}</span>
+                </div>
+
+                {% if user == ticket.property.owner or user.is_admin_role %}
+                    <div class="d-grid pt-2">
+                        <a href="{% url 'maintenance:update' ticket.id %}" class="btn btn-primary">
+                            <i class="bi bi-gear me-1"></i>Update Ticket Status
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us — RentEase Rental Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center gy-4 mb-5">
+        <div class="col-lg-6">
+            <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-2">About The Portal</span>
+            <h1 class="display-5 fw-bold mb-3">Engineered for Seamless Property Rental & Operations</h1>
+            <p class="lead text-secondary">
+                RentEase is an enterprise-grade web application created to simplify every touchpoint between property owners, tenants, and management staff.
+            </p>
+            <p class="text-muted">
+                Built on modern web standards with Django 5.2 LTS, PostgreSQL, and Bootstrap 5, our platform ensures robust security, role-based controls, and real-time transaction processing.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <div class="p-4 bg-white border rounded-4 shadow-sm">
+                <h5 class="fw-bold mb-3"><i class="bi bi-cpu text-primary me-2"></i>System Architecture</h5>
+                <ul class="list-unstyled d-flex flex-column gap-3 small">
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bi bi-check2-circle text-success fs-5"></i>
+                        <div><strong>Django 5.2 LTS:</strong> High-performance Python backend with custom role authentication.</div>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bi bi-check2-circle text-success fs-5"></i>
+                        <div><strong>PostgreSQL 17:</strong> High-concurrency relational data store with full ACID guarantees.</div>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bi bi-check2-circle text-success fs-5"></i>
+                        <div><strong>Bootstrap 5 & Django Templates:</strong> Server-rendered fast, accessible, responsive UI.</div>
+                    </li>
+                    <li class="d-flex align-items-start gap-2">
+                        <i class="bi bi-check2-circle text-success fs-5"></i>
+                        <div><strong>Modular Design:</strong> Decoupled apps for Accounts, Properties, Rentals, Payments, and Maintenance.</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

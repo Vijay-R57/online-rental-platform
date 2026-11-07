@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Rental Properties — RentEase{% endblock %}
+
+{% block content %}
+<div class="bg-white border-bottom py-4 mb-4">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="fw-bold mb-1 text-dark">Find Rental Properties</h2>
+                <p class="text-muted small mb-0">Browse through {{ total_count }} verified available rental homes and apartments.</p>
+            </div>
+            {% if user.is_authenticated and user.is_owner_role or user.is_admin_role %}
+                <a href="{% url 'properties:create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i>List a Property
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <!-- Search & Filter Sidebar -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-3 p-4 sticky-top" style="top: 90px; z-index: 10;">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-funnel text-primary me-2"></i>Filters</h5>
+                    <a href="{% url 'properties:list' %}" class="text-muted small text-decoration-none">Clear All</a>
+                </div>
+
+                <form method="get" action="{% url 'properties:list' %}">
+                    <!-- Location / Keyword -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-secondary">Location / Keyword</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
+                            <input type="text" name="location" class="form-control" placeholder="City or area..." value="{{ search_location }}">
+                        </div>
+                    </div>
+
+                    <!-- Property Type -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-secondary">Property Type</label>
+                        <select name="property_type" class="form-select">
+                            <option value="">All Types</option>
+                            {% for code, label in property_types %}
+                                <option value="{{ code }}" {% if request.GET.property_type == code %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold text-secondary">Min Rent ($)</label>
+                            <input type="number" name="min_rent" class="form-control" placeholder="0" value="{{ request.GET.min_rent }}">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold text-secondary">Max Rent ($)</label>
+                            <input type="number" name="max_rent" class="form-control" placeholder="5000" value="{{ request.GET.max_rent }}">
+                        </div>
+                    </div>
+
+                    <!-- Bedrooms -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-secondary">Min Bedrooms</label>
+                        <select name="bedrooms" class="form-select">
+                            <option value="">Any Bedrooms</option>
+                            <option value="1" {% if request.GET.bedrooms == '1' %}selected{% endif %}>1+ Bedrooms</option>
+                            <option value="2" {% if request.GET.bedrooms == '2' %}selected{% endif %}>2+ Bedrooms</option>
+                            <option value="3" {% if request.GET.bedrooms == '3' %}selected{% endif %}>3+ Bedrooms</option>
+                            <option value="4" {% if request.GET.bedrooms == '4' %}selected{% endif %}>4+ Bedrooms</option>
+                        </select>
+                    </div>
+
+                    <!-- Furnished Status -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-secondary">Furnishing</label>
+                        <select name="furnished_status" class="form-select">
+                            <option value="">Any</option>
+                            <option value="FURNISHED" {% if request.GET.furnished_status == 'FURNISHED' %}selected{% endif %}>Fully Furnished</option>
+                            <option value="SEMI_FURNISHED" {% if request.GET.furnished_status == 'SEMI_FURNISHED' %}selected{% endif %}>Semi-Furnished</option>
+                            <option value="UNFURNISHED" {% if request.GET.furnished_status == 'UNFURNISHED' %}selected{% endif %}>Unfurnished</option>
+                        </select>
+                    </div>
+
+                    <!-- Pet friendly checkbox -->
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" name="pet_friendly" value="true" id="petCheck" {% if request.GET.pet_friendly == 'true' %}checked{% endif %}>
+                        <label class="form-check-label small" for="petCheck">
+                            Pet-Friendly Only
+                        </label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary fw-semibold">
+                            <i class="bi bi-search me-1"></i>Apply Filters
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Property Results -->
+        <div class="col-lg-9">
+            <!-- Sort Bar -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted small">Showing <strong>{{ properties|length }}</strong> of <strong>{{ total_count }}</strong> listings</span>
+                <form method="get" class="d-flex align-items-center gap-2">
+                    <!-- Preserve existing get parameters -->
+                    {% for key, val in request.GET.items %}
+                        {% if key != 'sort' and key != 'page' %}
+                            <input type="hidden" name="{{ key }}" value="{{ val }}">
+                        {% endif %}
+                    {% endfor %}
+                    <label class="small text-muted text-nowrap">Sort by:</label>
+                    <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="bedrooms" {% if request.GET.sort == 'bedrooms' %}selected{% endif %}>Most Bedrooms</option>
+                    </select>
+                </form>
+            </div>
+
+            <!-- Property Cards Grid -->
+            <div class="row g-4">
+                {% for property in properties %}
+                <div class="col-md-6">
+                    <div class="property-card h-100 d-flex flex-column">
+                        <div class="position-relative">
+                            <img src="{{ property.primary_image_url }}" class="property-card-img" alt="{{ property.title }}" loading="lazy">
+                            <span class="badge bg-success position-absolute top-0 start-0 m-3 px-3 py-2 shadow-sm">
+                                {{ property.get_status_display }}
+                            </span>
+                            <span class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-3 px-3 py-2 shadow-sm">
+                                {{ property.get_property_type_display }}
+                            </span>
+                        </div>
+
+                        <div class="p-4 d-flex flex-column flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-baseline mb-2">
+                                <h4 class="fw-bold text-primary mb-0">${{ property.rent_amount }}<span class="text-muted fs-6 fw-normal"> / month</span></h4>
+                                <small class="text-muted">Deposit: ${{ property.security_deposit }}</small>
+                            </div>
+                            <h5 class="fw-bold mb-1 text-truncate">
+                                <a href="{% url 'properties:detail' property.slug %}" class="text-dark text-decoration-none">
+                                    {{ property.title }}
+                                </a>
+                            </h5>
+                            <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ property.address }}, {{ property.city }}, {{ property.state }}</p>
+
+                            <div class="d-flex justify-content-between border-top border-bottom py-2 my-2 text-secondary small">
+                                <span><i class="bi bi-door-open me-1"></i>{{ property.bedrooms }} Beds</span>
+                                <span><i class="bi bi-droplet me-1"></i>{{ property.bathrooms }} Baths</span>
+                                <span><i class="bi bi-bounding-box-circles me-1"></i>{{ property.area_sqft }} sqft</span>
+                            </div>
+
+                            <div class="mt-auto pt-3 d-flex gap-2">
+                                <a href="{% url 'properties:detail' property.slug %}" class="btn btn-outline-primary w-100 fw-medium">
+                                    View Details
+                                </a>
+                                {% if user.is_authenticated and user.is_tenant_role %}
+                                    <a href="{% url 'rentals:apply' property.id %}" class="btn btn-primary px-3 text-nowrap fw-medium">
+                                        Apply
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-3 text-center py-5">
+                        <i class="bi bi-houses display-3 text-muted mb-3"></i>
+                        <h4 class="fw-bold text-dark">No Properties Found</h4>
+                        <p class="text-muted small mb-3">Try adjusting your filters, location, or price range to find matching listings.</p>
+                        <a href="{% url 'properties:list' %}" class="btn btn-outline-primary d-inline-block mx-auto">
+                            Reset All Filters
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+
+                    {% for num in paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

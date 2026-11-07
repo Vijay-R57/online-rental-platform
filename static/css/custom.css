@@ -1,0 +1,165 @@
+/* Online Property Rental and Management Portal Custom Styles */
+
+:root {
+    --brand-primary: #1e3a8a;       /* Deep Slate Blue */
+    --brand-secondary: #0ea5e9;     /* Sky Cyan */
+    --brand-dark: #0f172a;          /* Midnight Navy */
+    --brand-light: #f8fafc;         /* Crisp Light Gray */
+    --brand-accent: #f59e0b;        /* Warm Amber */
+    --brand-success: #10b981;       /* Emerald */
+    --border-subtle: #e2e8f0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #334155;
+    background-color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--brand-primary) !important;
+}
+
+.navbar-brand i {
+    color: var(--brand-secondary);
+}
+
+.nav-link {
+    font-weight: 500;
+    color: #475569;
+    transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--brand-primary) !important;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0369a1 100%);
+    color: #ffffff;
+    padding: 5rem 0 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.hero-search-box {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    color: #1e293b;
+    margin-top: 2rem;
+}
+
+/* Badges & Tags */
+.badge-role-admin {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.badge-role-owner {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.badge-role-tenant {
+    background-color: #059669;
+    color: #ffffff;
+}
+
+/* Cards */
+.property-card {
+    border: 1px solid var(--border-subtle);
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #ffffff;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.property-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px -4px rgba(15, 23, 42, 0.08);
+}
+
+.property-card-img {
+    height: 220px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.feature-box {
+    background: #ffffff;
+    border: 1px solid var(--border-subtle);
+    border-radius: 1rem;
+    padding: 2rem;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.feature-box:hover {
+    border-color: var(--brand-secondary);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.feature-icon-wrapper {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.25rem;
+}
+
+/* Role Showcase Tabs */
+.role-tabs .nav-link {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+}
+
+.role-tabs .nav-link.active {
+    background-color: var(--brand-primary);
+    color: #ffffff !important;
+}
+
+/* Footer */
+footer {
+    background: #0f172a;
+    color: #94a3b8;
+    margin-top: auto;
+}
+
+footer a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+footer a:hover {
+    color: #ffffff;
+}
+

@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Simulated Checkout — Invoice #{{ payment.transaction_id }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payments:list' %}">Payments</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+        </ol>
+    </nav>
+
+    <!-- Sandbox Simulation Notice -->
+    <div class="alert alert-info border-info d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-exclamation fs-3 me-3 text-info"></i>
+        <div>
+            <h6 class="fw-bold mb-1">Simulated Payment Gateway (Sandbox Mode)</h6>
+            <span class="small">
+                This is a secure simulated demonstration transaction for this college mini-project. No real bank accounts or credit cards are billed. Click <strong>Process Simulated Payment</strong> to record a confirmed payment in PostgreSQL.
+            </span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Order / Invoice Breakdown -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-3 p-4 sticky-top" style="top: 90px;">
+                <h5 class="fw-bold mb-3 text-dark pb-2 border-bottom">Invoice Summary</h5>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Property Listing</span>
+                    <strong class="text-dark">{{ payment.lease.property.title }}</strong>
+                    <small class="text-muted d-block">{{ payment.lease.property.address }}, {{ payment.lease.property.city }}</small>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Lease Contract Reference</span>
+                    <span class="font-monospace text-primary fw-bold">#{{ payment.lease.lease_number }}</span>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Invoice Description</span>
+                    <span class="text-dark">{{ payment.description }}</span>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Due Date</span>
+                    <span class="text-dark">{{ payment.due_date|date:"F d, Y" }}</span>
+                </div>
+
+                <div class="border-top pt-3 mt-3 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-dark">Total Amount Due:</span>
+                    <span class="h3 fw-bold text-primary mb-0">${{ payment.amount }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Input Card -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                        <h4 class="fw-bold mb-1">Select Payment Method</h4>
+                        <p class="text-muted small mb-0">Simulate credit card, debit card, or UPI transaction settlement.</p>
+                    </div>
+                    <div class="fs-4 text-secondary d-flex gap-2">
+                        <i class="bi bi-credit-card-2-front text-primary"></i>
+                        <i class="bi bi-qr-code text-success"></i>
+                        <i class="bi bi-bank text-info"></i>
+                    </div>
+                </div>
+
+                <form method="post" id="checkoutForm">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Payment Channel</label>
+                        {{ form.payment_method }}
+                    </div>
+
+                    <!-- Card Section -->
+                    <div id="cardFieldsSection" class="p-3 bg-light rounded border mb-4">
+                        <h6 class="fw-bold text-dark mb-3 small text-uppercase"><i class="bi bi-credit-card me-1 text-primary"></i>Simulated Card Information</h6>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Card Number</label>
+                            {{ form.card_number }}
+                            <div class="form-text small">Demo card: <code>4242 4242 4242 4242</code> (auto-filled if blank).</div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Expiry Date</label>
+                                {{ form.card_expiry }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Security CVV</label>
+                                {{ form.card_cvv }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- UPI Section (Hidden by default unless UPI selected) -->
+                    <div id="upiFieldsSection" class="p-3 bg-light rounded border mb-4" style="display: none;">
+                        <h6 class="fw-bold text-dark mb-3 small text-uppercase"><i class="bi bi-qr-code me-1 text-success"></i>Simulated UPI Payment</h6>
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">UPI ID / VPA</label>
+                            {{ form.upi_id }}
+                            <div class="form-text small">e.g., <code>tenant@okaxis</code> or <code>9876543210@paytm</code></div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid pt-2">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm">
+                            <i class="bi bi-lock-fill me-2"></i>Process Simulated Payment (${{ payment.amount }})
+                        </button>
+                    </div>
+
+                    <p class="text-center small text-muted mt-3 mb-0">
+                        <i class="bi bi-shield-check text-success me-1"></i>256-Bit Simulated SSL Sandbox Encryption
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const methodSelect = document.getElementById('paymentMethodSelect');
+        const cardSection = document.getElementById('cardFieldsSection');
+        const upiSection = document.getElementById('upiFieldsSection');
+
+        function toggleSections() {
+            if (methodSelect.value === 'UPI') {
+                cardSection.style.display = 'none';
+                upiSection.style.display = 'block';
+            } else {
+                cardSection.style.display = 'block';
+                upiSection.style.display = 'none';
+            }
+        }
+
+        if (methodSelect) {
+            methodSelect.addEventListener('change', toggleSections);
+            toggleSections();
+        }
+    });
+</script>
+{% endblock %}
+

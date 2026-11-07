@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}RentEase — Online Property Rental & Management Portal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-white">
+    <div class="container position-relative">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-7">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-3">
+                    <i class="bi bi-stars me-1"></i> The Modern Way to Rent & Manage Properties
+                </span>
+                <h1 class="display-4 fw-bold lh-sm mb-3">
+                    Find Your Next Home or Manage Your Rental Portfolio with Confidence.
+                </h1>
+                <p class="lead text-light mb-4 opacity-90">
+                    A unified portal connecting Tenants, Landlords, and Property Managers. Complete leases online, automate rent payments, and manage maintenance tickets effortlessly.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-warning btn-lg fw-bold px-4 shadow">
+                        <i class="bi bi-person-plus-fill me-2"></i>Create Free Account
+                    </a>
+                    <a href="{% url 'properties:list' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-search me-2"></i>Browse Rentals
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <!-- Search Box Widget -->
+                <div class="hero-search-box">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center text-dark">
+                        <i class="bi bi-funnel-fill text-primary me-2"></i>Search Available Rentals
+                    </h5>
+                    <form action="{% url 'properties:list' %}" method="get">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">City, Neighborhood, or ZIP</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
+                                <input type="text" name="location" class="form-control" placeholder="e.g. Downtown, Greenfield" value="City Center">
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Property Type</label>
+                                <select name="type" class="form-select">
+                                    <option value="">All Types</option>
+                                    <option value="apartment" selected>Apartment</option>
+                                    <option value="house">Single Family</option>
+                                    <option value="condo">Condominium</option>
+                                    <option value="studio">Studio Loft</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Max Budget ($/mo)</label>
+                                <select name="max_price" class="form-select">
+                                    <option value="">Any Price</option>
+                                    <option value="1500">Up to $1,500</option>
+                                    <option value="2500" selected>Up to $2,500</option>
+                                    <option value="3500">Up to $3,500</option>
+                                    <option value="5000">Up to $5,000</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg fw-semibold">
+                                <i class="bi bi-search me-2"></i>Search Listings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Counter Banner -->
+<section class="py-4 bg-white border-bottom shadow-sm">
+    <div class="container">
+        <div class="row text-center gy-3">
+            <div class="col-6 col-md-3">
+                <h3 class="fw-extrabold text-primary mb-1">{{ portal_stats.active_listings }}</h3>
+                <span class="text-secondary small fw-medium">Active Listings</span>
+            </div>
+            <div class="col-6 col-md-3">
+                <h3 class="fw-extrabold text-primary mb-1">{{ portal_stats.verified_tenants }}</h3>
+                <span class="text-secondary small fw-medium">Verified Tenants</span>
+            </div>
+            <div class="col-6 col-md-3">
+                <h3 class="fw-extrabold text-primary mb-1">{{ portal_stats.managed_properties }}</h3>
+                <span class="text-secondary small fw-medium">Managed Properties</span>
+            </div>
+            <div class="col-6 col-md-3">
+                <h3 class="fw-extrabold text-primary mb-1">{{ portal_stats.satisfaction_rate }}</h3>
+                <span class="text-secondary small fw-medium">Tenant Satisfaction</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Role-Based Solutions Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center max-w-2xl mx-auto mb-5">
+            <span class="text-uppercase fw-bold text-primary small tracking-wider">Tailored Experience</span>
+            <h2 class="fw-bold mt-2">Built for Every Real Estate Stakeholder</h2>
+            <p class="text-muted">Explore how our modular portal powers smooth workflows for all user roles.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Tenants Card -->
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper bg-success-subtle text-success">
+                        <i class="bi bi-person-heart"></i>
+                    </div>
+                    <span class="badge bg-success-subtle text-success mb-2 fw-semibold">Role: TENANT</span>
+                    <h4 class="fw-bold">For Renters & Tenants</h4>
+                    <p class="text-muted small">
+                        Discover verified rentals, submit digital applications, sign digital lease agreements, pay rent securely, and log maintenance tickets.
+                    </p>
+                    <ul class="list-unstyled small d-flex flex-column gap-2 mt-3 text-secondary">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Verified property listings</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Direct digital rent payment</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> 24/7 maintenance request portal</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Owners Card -->
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper bg-primary-subtle text-primary">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <span class="badge bg-primary-subtle text-primary mb-2 fw-semibold">Role: OWNER</span>
+                    <h4 class="fw-bold">For Property Owners</h4>
+                    <p class="text-muted small">
+                        List multiple units, review tenant applications, collect rent automatically into your bank, and track expenses and maintenance contractors.
+                    </p>
+                    <ul class="list-unstyled small d-flex flex-column gap-2 mt-3 text-secondary">
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Multi-unit property listings</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Automated rent invoicing</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Financial statements & yields</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Admin Card -->
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper bg-danger-subtle text-danger">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <span class="badge bg-danger-subtle text-danger mb-2 fw-semibold">Role: ADMIN</span>
+                    <h4 class="fw-bold">For Administrators</h4>
+                    <p class="text-muted small">
+                        Full platform oversight. Manage users, verify credentials, audit transactions, resolve disputes, and maintain compliance across the system.
+                    </p>
+                    <ul class="list-unstyled small d-flex flex-column gap-2 mt-3 text-secondary">
+                        <li><i class="bi bi-check-circle-fill text-danger me-2"></i> Custom User role controls</li>
+                        <li><i class="bi bi-check-circle-fill text-danger me-2"></i> Audit logs & transaction history</li>
+                        <li><i class="bi bi-check-circle-fill text-danger me-2"></i> Django Admin dashboard suite</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Properties Preview Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+            <div>
+                <span class="text-uppercase fw-bold text-primary small tracking-wider">Top Picks</span>
+                <h2 class="fw-bold mt-1">Featured Rental Properties</h2>
+                <p class="text-muted mb-0">Handpicked premium properties verified by our management team.</p>
+            </div>
+            <a href="{% url 'properties:list' %}" class="btn btn-outline-primary mt-3 mt-md-0">
+                View All Listings <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for prop in featured_properties %}
+            <div class="col-lg-4 col-md-6">
+                <div class="property-card h-100 d-flex flex-column">
+                    <div class="position-relative">
+                        <img src="{{ prop.primary_image_url }}" class="property-card-img" alt="{{ prop.title }}" loading="lazy">
+                        <span class="badge bg-success position-absolute top-0 start-0 m-3 px-3 py-2 shadow-sm">
+                            {{ prop.get_status_display }}
+                        </span>
+                        <span class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-3 px-3 py-2 shadow-sm">
+                            {{ prop.get_property_type_display }}
+                        </span>
+                    </div>
+
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-baseline mb-2">
+                            <h4 class="fw-bold text-primary mb-0">${{ prop.rent_amount }}<span class="text-muted fs-6 fw-normal"> / mo</span></h4>
+                        </div>
+                        <h5 class="fw-bold mb-2 text-truncate">
+                            <a href="{% url 'properties:detail' prop.slug %}" class="text-dark text-decoration-none">
+                                {{ prop.title }}
+                            </a>
+                        </h5>
+                        <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ prop.address }}, {{ prop.city }}</p>
+
+                        <div class="d-flex justify-content-between border-top border-bottom py-2 my-2 text-secondary small">
+                            <span><i class="bi bi-door-open me-1"></i>{{ prop.bedrooms }} Beds</span>
+                            <span><i class="bi bi-droplet me-1"></i>{{ prop.bathrooms }} Baths</span>
+                            <span><i class="bi bi-bounding-box-circles me-1"></i>{{ prop.area_sqft }} sq ft</span>
+                        </div>
+
+                        <div class="mt-auto pt-3">
+                            <a href="{% url 'properties:detail' prop.slug %}" class="btn btn-outline-primary w-100 fw-medium">
+                                View Details & Apply
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4 text-muted">
+                <p>Welcome to RentEase! Browse our properties catalog or list your own rental property.</p>
+                <a href="{% url 'properties:list' %}" class="btn btn-primary">Browse Properties</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <div class="text-center max-w-2xl mx-auto mb-5">
+            <span class="text-uppercase fw-bold text-primary small tracking-wider">Simple Process</span>
+            <h2 class="fw-bold mt-2">How RentEase Works</h2>
+            <p class="text-muted">A seamless 3-step lifecycle for renters and property owners.</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 70px; height: 70px; font-size: 1.75rem;">
+                        1
+                    </div>
+                    <h5 class="fw-bold">Search & Discover</h5>
+                    <p class="text-muted small">
+                        Browse verified property listings with detailed photos, pricing, amenities, and neighborhood details.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 70px; height: 70px; font-size: 1.75rem;">
+                        2
+                    </div>
+                    <h5 class="fw-bold">Apply & Sign Online</h5>
+                    <p class="text-muted small">
+                        Submit applications with one click, undergo streamlined screening, and execute digital leases securely.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 70px; height: 70px; font-size: 1.75rem;">
+                        3
+                    </div>
+                    <h5 class="fw-bold">Pay & Manage</h5>
+                    <p class="text-muted small">
+                        Automate recurring rent payments, dispatch maintenance requests, and track property performance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container py-3">
+        <h2 class="display-6 fw-bold mb-3">Ready to Transform Your Rental Experience?</h2>
+        <p class="lead opacity-90 mb-4 max-w-xl mx-auto">
+            Join thousands of tenants and property owners using our next-generation property management solution.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'accounts:register' %}" class="btn btn-warning btn-lg fw-bold px-4 shadow">
+                Get Started Now
+            </a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4">
+                Sign In to Account
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

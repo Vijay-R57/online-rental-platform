@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Receipt #{{ payment.transaction_id }} — RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'payments:list' %}">Payments</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Receipt #{{ payment.transaction_id }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-md-5 bg-white">
+                <!-- Receipt Header -->
+                <div class="d-flex justify-content-between align-items-start pb-4 mb-4 border-bottom">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-buildings-fill fs-3 text-primary"></i>
+                            <span class="fw-bold tracking-tight text-dark fs-4">Rent<span class="text-primary">Ease</span></span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-1">Official Payment Receipt</h4>
+                        <span class="small text-muted font-monospace">Transaction Ref: {{ payment.transaction_id }}</span>
+                    </div>
+
+                    <div class="text-end">
+                        <span class="badge bg-success px-3 py-2 fs-6 mb-2 d-inline-block">
+                            <i class="bi bi-check-circle-fill me-1"></i>PAID & SETTLED
+                        </span>
+                        <small class="text-muted d-block">Settled On: {{ payment.paid_at|date:"F d, Y H:i" }}</small>
+                    </div>
+                </div>
+
+                <!-- Parties Summary -->
+                <div class="row g-4 mb-4">
+                    <div class="col-sm-6">
+                        <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Payer (Tenant)</span>
+                        <strong class="text-dark d-block">{{ payment.tenant.get_full_name|default:payment.tenant.username }}</strong>
+                        <span class="text-muted small d-block">{{ payment.tenant.email }}</span>
+                        {% if payment.tenant.phone_number %}
+                            <span class="text-muted small d-block">{{ payment.tenant.phone_number }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-6 text-sm-end">
+                        <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Payee (Landlord / Escrow)</span>
+                        <strong class="text-dark d-block">{{ payment.lease.owner.get_full_name|default:payment.lease.owner.username }}</strong>
+                        <span class="text-muted small d-block">{{ payment.lease.owner.email }}</span>
+                        <span class="text-muted small d-block">Lease #{{ payment.lease.lease_number }}</span>
+                    </div>
+                </div>
+
+                <!-- Property Details -->
+                <div class="p-3 bg-light rounded border mb-4 small">
+                    <span class="text-muted d-block">Demised Premises:</span>
+                    <strong class="text-dark">{{ payment.lease.property.title }}</strong><br>
+                    {{ payment.lease.property.address }}, {{ payment.lease.property.city }}, {{ payment.lease.property.state }} {{ payment.lease.property.postal_code }}
+                </div>
+
+                <!-- Breakdown Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered mb-0">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Item Description</th>
+                                <th>Type</th>
+                                <th>Method</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>{{ payment.description }}</strong>
+                                    <small class="text-muted d-block">Billing cycle due: {{ payment.due_date|date:"M d, Y" }}</small>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ payment.get_payment_type_display }}</span></td>
+                                <td>{{ payment.get_payment_method_display }}</td>
+                                <td class="text-end fw-bold">${{ payment.amount }}</td>
+                            </tr>
+                            <tr class="table-light">
+                                <td colspan="3" class="text-end fw-bold">Total Settled:</td>
+                                <td class="text-end fw-bold text-success h5 mb-0">${{ payment.amount }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="p-3 rounded bg-light border text-center small text-muted mb-4">
+                    <i class="bi bi-info-circle me-1"></i>This electronic receipt serves as official proof of rent payment pursuant to Lease agreement #{{ payment.lease.lease_number }}.
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a href="{% url 'payments:list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Payments
+                    </a>
+                    <button onclick="window.print()" class="btn btn-primary">
+                        <i class="bi bi-printer me-1"></i>Print Official Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

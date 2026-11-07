@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}My Rental Applications — RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Applications</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+        <div>
+            <h3 class="fw-bold mb-1">My Rental Applications</h3>
+            <p class="text-muted small mb-0">Track the review status and approval outcome of your rental applications.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'properties:list' %}" class="btn btn-outline-primary">
+                <i class="bi bi-search me-1"></i>Find More Properties
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 80px;">Property</th>
+                        <th>Listing Details</th>
+                        <th>Landlord</th>
+                        <th>Monthly Rent</th>
+                        <th>Move-In Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>
+                            <img src="{{ app.property.primary_image_url }}" alt="{{ app.property.title }}" class="rounded border" style="width: 70px; height: 50px; object-fit: cover;">
+                        </td>
+                        <td>
+                            <strong class="text-dark d-block">
+                                <a href="{% url 'properties:detail' app.property.slug %}" class="text-decoration-none text-dark">
+                                    {{ app.property.title }}
+                                </a>
+                            </strong>
+                            <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ app.property.city }} &bull; Applied: {{ app.applied_at|date:"M d, Y" }}</small>
+                        </td>
+                        <td>{{ app.property.owner.get_full_name|default:app.property.owner.username }}</td>
+                        <td><strong class="text-primary">${{ app.property.rent_amount }}</strong></td>
+                        <td>{{ app.proposed_move_in|date:"M d, Y" }}</td>
+                        <td>
+                            {% if app.status == 'PENDING' %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock-history me-1"></i>Under Review</span>
+                            {% elif app.status == 'APPROVED' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Approved!</span>
+                            {% elif app.status == 'REJECTED' %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Declined</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Withdrawn</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if app.status == 'APPROVED' %}
+                                <a href="{% url 'rentals:lease_list' %}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-file-earmark-text me-1"></i>View Lease
+                                </a>
+                            {% else %}
+                                <a href="{% url 'properties:detail' app.property.slug %}" class="btn btn-sm btn-outline-secondary">
+                                    View Property
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-file-earmark-person display-4 d-block mb-3 text-secondary"></i>
+                            <h5 class="fw-semibold">No Applications Submitted</h5>
+                            <p class="small text-muted mb-3">You haven't submitted any rental applications yet. Browse verified listings to apply.</p>
+                            <a href="{% url 'properties:list' %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-search me-1"></i>Browse Available Properties
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

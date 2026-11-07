@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Maintenance Issue — RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'maintenance:list' %}">Maintenance</a></li>
+            <li class="breadcrumb-item active" aria-current="page">New Ticket</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 56px; height: 56px;">
+                        <i class="bi bi-tools fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold">Report a Maintenance Issue</h3>
+                    <p class="text-muted small">Submit defect or repair requests directly to your landlord and property management team.</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Rented Property *</label>
+                        {{ form.property }}
+                        <div class="form-text small">Select the unit experiencing the issue.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Summary / Title *</label>
+                        {{ form.title }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Category *</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Priority Level *</label>
+                            {{ form.priority }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Detailed Description *</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Photo Attachment (Optional)</label>
+                        {{ form.attachment }}
+                        <div class="form-text small">Photos of leaks, error codes, or physical damage help technicians prepare the right parts.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'maintenance:list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-send me-1"></i>Submit Ticket
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Applications for {{ property.title }} — RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'properties:owner_list' %}">My Properties</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'properties:detail' property.slug %}">{{ property.title|truncatechars:25 }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Applications</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+        <div>
+            <h3 class="fw-bold mb-1">Applications: {{ property.title }}</h3>
+            <p class="text-muted small mb-0">{{ property.address }}, {{ property.city }} &bull; ${{ property.rent_amount }}/mo</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'properties:owner_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Properties
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Applicant</th>
+                        <th>Income</th>
+                        <th>Credit</th>
+                        <th>Occupants</th>
+                        <th>Pets</th>
+                        <th>Move-in</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>
+                            <strong class="text-dark d-block">{{ app.applicant.get_full_name|default:app.applicant.username }}</strong>
+                            <small class="text-muted">{{ app.applicant.email }}</small>
+                        </td>
+                        <td><strong class="text-success">${{ app.annual_income|floatformat:0 }}</strong></td>
+                        <td><span class="badge bg-light text-dark border">{{ app.get_credit_score_range_display }}</span></td>
+                        <td>{{ app.occupants_count }}</td>
+                        <td>{% if app.has_pets %}<i class="bi bi-check-circle text-success"></i> Yes{% else %}No{% endif %}</td>
+                        <td>{{ app.proposed_move_in|date:"M d, Y" }}</td>
+                        <td>
+                            {% if app.status == 'PENDING' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif app.status == 'APPROVED' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% elif app.status == 'REJECTED' %}
+                                <span class="badge bg-danger">Declined</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Withdrawn</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'rentals:review_application' app.id %}" class="btn btn-sm btn-primary">
+                                Review & Decide
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox display-4 d-block mb-3 text-secondary"></i>
+                            <h5 class="fw-semibold">No Applications for this Listing Yet</h5>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

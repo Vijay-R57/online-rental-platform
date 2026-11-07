@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Verification Document — RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:documents' %}">Documents</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Upload</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 56px; height: 56px;">
+                        <i class="bi bi-file-earmark-arrow-up fs-3"></i>
+                    </div>
+                    <h4 class="fw-bold">Upload Verification Document</h4>
+                    <p class="text-muted small">Documents are encrypted and accessible only to property owners reviewing your application.</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Document Type *</label>
+                        {{ form.document_type }}
+                        <div class="form-text small">Select what kind of verification document you are uploading.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Document Title / Description *</label>
+                        {{ form.title }}
+                        <div class="form-text small">e.g., "State Driver's License - Exp 2028", "September Payslip".</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Choose File *</label>
+                        {{ form.document_file }}
+                        <div class="form-text small">Supported formats: PDF, JPG, PNG, WebP (Max 10MB).</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'accounts:documents' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-cloud-arrow-up me-1"></i>Upload Document
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

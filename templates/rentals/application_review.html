@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Application — {{ object.applicant.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'rentals:owner_applications' %}">Applications</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Review #{{ object.id }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Applicant Profile Card -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                    {% if object.applicant.profile_picture %}
+                        <img src="{{ object.applicant.profile_picture.url }}" class="rounded-circle border" style="width: 60px; height: 60px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 1.75rem;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark">{{ object.applicant.get_full_name|default:object.applicant.username }}</h5>
+                        <p class="text-muted small mb-0">@{{ object.applicant.username }}</p>
+                        {% if object.applicant.is_verified %}
+                            <span class="badge bg-success small"><i class="bi bi-patch-check-fill me-1"></i>KYC Verified</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <h6 class="fw-bold text-primary small text-uppercase mb-2">Applicant Financials</h6>
+                <div class="row g-2 small mb-3">
+                    <div class="col-6 text-muted">Annual Income:</div>
+                    <div class="col-6 fw-bold text-success text-end">${{ object.annual_income|floatformat:2 }}</div>
+
+                    <div class="col-6 text-muted">Employment:</div>
+                    <div class="col-6 fw-bold text-dark text-end">{{ object.employment_status }}</div>
+
+                    <div class="col-6 text-muted">Employer:</div>
+                    <div class="col-6 fw-bold text-dark text-end">{{ object.employer_name|default:"Not specified" }}</div>
+
+                    <div class="col-6 text-muted">Credit Score:</div>
+                    <div class="col-6 fw-bold text-dark text-end">{{ object.get_credit_score_range_display }}</div>
+                </div>
+
+                <h6 class="fw-bold text-primary small text-uppercase mb-2">Tenancy Preferences</h6>
+                <div class="row g-2 small mb-3">
+                    <div class="col-6 text-muted">Proposed Move-In:</div>
+                    <div class="col-6 fw-bold text-dark text-end">{{ object.proposed_move_in|date:"M d, Y" }}</div>
+
+                    <div class="col-6 text-muted">Lease Term:</div>
+                    <div class="col-6 fw-bold text-dark text-end">{{ object.lease_term_months }} Months</div>
+
+                    <div class="col-6 text-muted">Occupants:</div>
+                    <div class="col-6 fw-bold text-dark text-end">{{ object.occupants_count }} Person(s)</div>
+
+                    <div class="col-6 text-muted">Domestic Pets:</div>
+                    <div class="col-6 fw-bold text-dark text-end">{% if object.has_pets %}Yes ({{ object.pets_description }}){% else %}None{% endif %}</div>
+                </div>
+
+                {% if object.message_to_landlord %}
+                    <h6 class="fw-bold text-primary small text-uppercase mb-2">Message from Applicant</h6>
+                    <div class="p-3 bg-light rounded border small text-secondary">
+                        "{{ object.message_to_landlord }}"
+                    </div>
+                {% endif %}
+
+                <!-- Tenant Uploaded Documents Preview -->
+                <h6 class="fw-bold text-primary small text-uppercase mt-4 mb-2">Uploaded Verification Documents</h6>
+                {% if object.applicant.documents.exists %}
+                    <ul class="list-group list-group-flush small">
+                        {% for doc in object.applicant.documents.all %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-file-earmark-check text-primary me-1"></i>
+                                <strong>{{ doc.title }}</strong>
+                                <small class="text-muted d-block">{{ doc.get_document_type_display }}</small>
+                            </div>
+                            <a href="{% url 'accounts:document_download' doc.pk %}" target="_blank" class="btn btn-sm btn-outline-primary py-0">View</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted small mb-0">No documents uploaded by this applicant.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Decision Box -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-md-5">
+                <h4 class="fw-bold mb-1 text-dark">Application Decision</h4>
+                <p class="text-muted small mb-4">
+                    For Property: <strong>{{ object.property.title }}</strong> (${{ object.property.rent_amount }}/month).
+                </p>
+
+                <div class="alert alert-info py-2 small mb-4">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>Automated Workflow:</strong> Approving this application will automatically generate a confirmed Booking, set the property status to Occupied, and issue a formal Lease Agreement ready for tenant signature.
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Application Decision *</label>
+                        {{ form.status }}
+                        <div class="form-text small">Select 'Application Approved' to accept tenancy or 'Application Declined'.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Landlord Review Notes & Feedback</label>
+                        {{ form.owner_notes }}
+                        <div class="form-text small">Visible to applicant upon review completion.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'rentals:owner_applications' %}" class="btn btn-outline-secondary">Back to Inbox</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i>Save & Execute Decision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit Listing — {{ form.instance.title }}{% else %}List a New Property — RentEase{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'properties:owner_list' %}">My Properties</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{% if form.instance.pk %}Edit Listing{% else %}New Listing{% endif %}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                        <h3 class="fw-bold mb-1">{% if form.instance.pk %}Edit Property Listing{% else %}List a Rental Property{% endif %}</h3>
+                        <p class="text-muted small mb-0">Provide complete specifications, pricing, and amenities for tenant discovery.</p>
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                    <div class="alert alert-danger py-2 small" role="alert">
+                        <strong>Please resolve the form errors below:</strong>
+                        <ul class="mb-0 mt-1 ps-3">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Core Details -->
+                    <h5 class="fw-bold text-primary mb-3">1. Basic Property Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold">Listing Title *</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Property Type *</label>
+                            {{ form.property_type }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Status *</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold">Full Description *</label>
+                            {{ form.description }}
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Specs -->
+                    <h5 class="fw-bold text-primary mb-3">2. Pricing & Dimensions</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Monthly Rent ($) *</label>
+                            {{ form.rent_amount }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Security Deposit ($) *</label>
+                            {{ form.security_deposit }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Bedrooms *</label>
+                            {{ form.bedrooms }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Bathrooms *</label>
+                            {{ form.bathrooms }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Area (Sq. Ft.) *</label>
+                            {{ form.area_sqft }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Furnishing *</label>
+                            {{ form.furnished_status }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Available From *</label>
+                            {{ form.available_from }}
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check mt-2">
+                                {{ form.pet_friendly }}
+                                <label class="form-check-label small fw-semibold ms-2" for="{{ form.pet_friendly.id_for_label }}">
+                                    Pet Friendly (Permit domestic pets)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <h5 class="fw-bold text-primary mb-3">3. Location & Address</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold">Street Address *</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">City *</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">State / Province *</label>
+                            {{ form.state }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Postal / ZIP Code *</label>
+                            {{ form.postal_code }}
+                        </div>
+                    </div>
+
+                    <!-- Amenities -->
+                    <h5 class="fw-bold text-primary mb-3">4. Amenities & Inclusions</h5>
+                    <div class="p-3 bg-light rounded border mb-4">
+                        <div class="row g-2">
+                            {% for amenity in form.amenities %}
+                                <div class="col-sm-6 col-md-4">
+                                    <div class="form-check">
+                                        {{ amenity.tag }}
+                                        <label class="form-check-label small" for="{{ amenity.id_for_label }}">
+                                            {{ amenity.choice_label }}
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Cover Photo -->
+                    <h5 class="fw-bold text-primary mb-3">5. Featured Cover Photo</h5>
+                    <div class="mb-4">
+                        {{ form.featured_image }}
+                        <div class="form-text small">Upload high-resolution landscape photo. Extra gallery photos can be added after saving.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'properties:owner_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i>{% if form.instance.pk %}Update Listing{% else %}Publish Listing{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

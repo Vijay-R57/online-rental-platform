@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}My Rentals & Leases — RentEase{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Rental Agreements</h2>
+            <p class="text-muted">Manage active leases, application status, and terms.</p>
+        </div>
+        <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+        </a>
+    </div>
+
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+        <div>
+            <strong>Phase 1 Foundation Ready:</strong> The <code>rentals</code> modular app is registered and routed. Lease execution models will be enabled in Phase 2.
+        </div>
+    </div>
+</div>
+{% endblock %}
+

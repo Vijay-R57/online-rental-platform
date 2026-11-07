@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Property — {{ object.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-3 p-4 text-center">
+                <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-trash fs-2"></i>
+                </div>
+                <h4 class="fw-bold mb-2">Delete Property Listing?</h4>
+                <p class="text-muted small mb-4">
+                    Are you sure you want to delete <strong>"{{ object.title }}"</strong> located at {{ object.city }}? This will also remove associated gallery images and unlinked records.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'properties:owner_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-danger px-4">Yes, Delete Property</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

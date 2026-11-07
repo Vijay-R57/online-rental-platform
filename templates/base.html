@@ -1,0 +1,221 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Property Rental & Management Portal{% endblock %}</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Portal CSS -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'core:home' %}">
+                <i class="bi bi-buildings-fill fs-3 text-primary"></i>
+                <span class="fw-bold tracking-tight text-dark fs-4">Rent<span class="text-primary">Ease</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">
+                            <i class="bi bi-house-door me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'properties' in request.path and not 'my-properties' in request.path %}active{% endif %}" href="{% url 'properties:list' %}">
+                            <i class="bi bi-search me-1"></i>Browse Properties
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        {% if user.is_owner_role or user.is_admin_role %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'my-properties' in request.path %}active{% endif %}" href="{% url 'properties:owner_list' %}">
+                                    <i class="bi bi-buildings me-1"></i>My Properties
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'owner/applications' in request.path %}active{% endif %}" href="{% url 'rentals:owner_applications' %}">
+                                    <i class="bi bi-inbox me-1"></i>Applications
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'my-applications' in request.path %}active{% endif %}" href="{% url 'rentals:my_applications' %}">
+                                    <i class="bi bi-file-earmark-person me-1"></i>My Applications
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'leases' in request.path %}active{% endif %}" href="{% url 'rentals:lease_list' %}">
+                                <i class="bi bi-file-earmark-text me-1"></i>Leases
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'payments' in request.path %}active{% endif %}" href="{% url 'payments:list' %}">
+                                <i class="bi bi-credit-card me-1"></i>Payments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'maintenance' in request.path %}active{% endif %}" href="{% url 'maintenance:list' %}">
+                                <i class="bi bi-tools me-1"></i>Maintenance
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:home' %}#how-it-works">
+                                <i class="bi bi-lightning-charge me-1"></i>How It Works
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">
+                                <i class="bi bi-info-circle me-1"></i>About
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <!-- User Session Actions -->
+                <div class="d-flex align-items-center gap-2">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle fs-5"></i>
+                                <span class="fw-medium">{{ user.username }}</span>
+                                <span class="badge {% if user.role == 'ADMIN' %}badge-role-admin{% elif user.role == 'OWNER' %}badge-role-owner{% else %}badge-role-tenant{% endif %}">
+                                    {{ user.get_role_display }}
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li>
+                                    <h6 class="dropdown-header">Logged in as {{ user.get_role_display }}</h6>
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'dashboard:index' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person-gear me-2"></i>My Profile</a></li>
+                                {% if user.is_tenant_role %}
+                                    <li><a class="dropdown-item" href="{% url 'accounts:documents' %}"><i class="bi bi-file-earmark-lock me-2"></i>Verification Documents</a></li>
+                                {% endif %}
+                                {% if user.is_admin_role %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="/admin/" target="_blank"><i class="bi bi-shield-lock me-2"></i>Django Admin</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'accounts:logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary px-3">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                        </a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-primary px-3 shadow-sm">
+                            <i class="bi bi-person-plus me-1"></i>Get Started
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Global Alert / Messages Container -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="text-white fw-bold d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-buildings-fill text-info"></i> RentEase Portal
+                    </h5>
+                    <p class="small text-muted">
+                        Enterprise-ready Online Property Rental and Management Portal engineered on Django 5.2 LTS, PostgreSQL, and Bootstrap 5. Unifying landlords, tenants, and administrators into one seamless workflow.
+                    </p>
+                    <div class="d-flex gap-3 fs-5 mt-3">
+                        <a href="#" class="text-secondary"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-secondary"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="text-secondary"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="text-secondary"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="text-white fw-semibold mb-3">Quick Links</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2">
+                        <li><a href="{% url 'core:home' %}">Home</a></li>
+                        <li><a href="{% url 'properties:list' %}">Browse Properties</a></li>
+                        <li><a href="{% url 'core:home' %}#how-it-works">How It Works</a></li>
+                        <li><a href="{% url 'core:about' %}">About Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="text-white fw-semibold mb-3">Portal Modules</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2">
+                        <li><span class="text-light">Accounts & Authentication</span></li>
+                        <li><span class="text-light">Property Management</span></li>
+                        <li><span class="text-light">Lease Agreements</span></li>
+                        <li><span class="text-light">Automated Rent Payments</span></li>
+                        <li><span class="text-light">Maintenance Dispatch</span></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="text-white fw-semibold mb-3">Security & Compliance</h6>
+                    <p class="small text-muted mb-2">
+                        Role-based access controls for Admin, Property Owners, and Tenants with PostgreSQL ACID consistency.
+                    </p>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                        <i class="bi bi-shield-check me-1"></i> Django 5.2 LTS Verified
+                    </span>
+                </div>
+            </div>
+
+            <hr class="border-secondary my-4">
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center small">
+                <span>&copy; 2026 RentEase Property Management Portal. All rights reserved.</span>
+                <span class="mt-2 mt-sm-0 text-muted">Powered by Python, Django & PostgreSQL</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5.3 Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Custom Portal Script -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

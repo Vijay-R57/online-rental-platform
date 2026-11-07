@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile — RentEase Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'accounts:profile' %}">Profile</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                        <h4 class="fw-bold mb-1">Edit Account Profile</h4>
+                        <p class="text-muted small mb-0">Update your personal, residential, and emergency contact details.</p>
+                    </div>
+                    <span class="badge {% if user.role == 'ADMIN' %}badge-role-admin{% elif user.role == 'OWNER' %}badge-role-owner{% else %}badge-role-tenant{% endif %}">
+                        {{ user.get_role_display }}
+                    </span>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <h6 class="text-primary fw-bold text-uppercase small mb-3">Personal Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Email Address</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold">Profile Avatar</label>
+                            {{ form.profile_picture }}
+                            <div class="form-text small">Accepted formats: JPG, PNG, WebP.</div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold">Bio / Summary</label>
+                            {{ form.bio }}
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary fw-bold text-uppercase small mb-3">Residential Address</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold">Street Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">City</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">State / Province</label>
+                            {{ form.state }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Postal / ZIP Code</label>
+                            {{ form.postal_code }}
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary fw-bold text-uppercase small mb-3">Employment & Emergency Contacts</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Occupation / Title</label>
+                            {{ form.occupation }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Company / Employer</label>
+                            {{ form.company_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Emergency Contact Name</label>
+                            {{ form.emergency_contact_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Emergency Contact Phone</label>
+                            {{ form.emergency_contact_phone }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
